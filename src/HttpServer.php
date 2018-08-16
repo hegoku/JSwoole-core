@@ -21,8 +21,12 @@ class HttpServer
     public function run()
     {
         $this->swoole_http_server=new SwooleServer($this->host, $this->port, SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
-        $this->swoole_http_server->on('ManagerStart', $this->manager_start_callback);
-        $this->swoole_http_server->on('WorkerStart', $this->worker_start_callback);
+        if ($this->manager_start_callback) {
+            $this->swoole_http_server->on('ManagerStart', $this->manager_start_callback);
+        }
+        if ($this->worker_start_callback) {
+            $this->swoole_http_server->on('WorkerStart', $this->worker_start_callback);
+        }
         $this->swoole_http_server->on('request', $this->request_callback);
         $this->swoole_http_server->start();
     }
