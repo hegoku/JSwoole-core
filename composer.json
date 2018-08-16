@@ -1,5 +1,5 @@
 {
-    "name": "JSwoole-core",
+    "name": "hegoku/JSwoole-core",
     "description": "A Swoole Framework core",
     "type": "library",
     "authors": [
