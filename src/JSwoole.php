@@ -1,49 +1,47 @@
 <?php
 namespace JSwoole;
 
+use JSwoole\Content\WorkerContent;
+use JSwoole\Content\RequestContent;
+
 class JSwoole
 {
-    public static $app;
-    public $worker_id=0;
-    public $app_config=[];
-    public $components=[];
+    protected static $requestContent=[];
+    protected static $worker_content;
 
-    public static function init()
+    public static function initWorderContent($worker_id, $app_config)
     {
-        static::$app=new static();
+        static::$worker_content=new WorkerContent($worker_id);
+        static::$worker_content->setConfig($app_config);
     }
 
-    public function setConfig($config)
+    public static function getWorkerContent()
     {
-        $this->app_config=$config;
+        return static::$worker_content;
     }
 
-    public function getConfig($name)
+    public static function addRequestContent()
     {
-        if (isset($this->app_config[$name])) {
-            return $this->app_config[$name];
-        } else {
-            return null;
+        $cid=\co::getuid();
+        if (isset(static::$requestContent[$cid])) {
+            unset(static::$requestContent[$cid]);
+        }
+        static::$requestContent[$cid]=new RequestContent(static::getWorkerContent());
+    }
+
+    public static function removeRequestContent()
+    {
+        $cid=\co::getuid();
+        if (isset(static::$requestContent[$cid])) {
+            unset(static::$requestContent[$cid]);
         }
     }
 
-    public function loadComponents()
+    public static function app()
     {
-        foreach ($this->app_config as $class=>$param) {
-            $class_name=$param['class'];
-            $this->components[$class]=new $class_name();
-        }
-    }
-
-    public function getRote()
-    {
-        return $this->app_config['route'];
-    }
-
-    public function __get($name)
-    {
-        if (isset($this->components[$name])) {
-            return $this->components[$name];
+        $cid=\co::getuid();
+        if (isset(static::$requestContent[$cid])) {
+            return static::$requestContent[$cid];
         } else {
             return null;
         }
