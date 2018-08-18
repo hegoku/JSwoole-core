@@ -1,19 +1,19 @@
 <?php
-namespace JSwoole\Content;
+namespace JSwoole\Context;
 
-class RequestContent
+class RequestContext
 {
     protected $components=[];
-    protected $worker_content;
+    protected $worker_context;
 
-    public function __construct($worker_content)
+    public function __construct($worker_context)
     {
-        $this->worker_content=$worker_content;   
+        $this->worker_context=$worker_context;   
     }
 
     public function loadComponents()
     {
-        foreach ($this->worker_content->getConfig('components') as $class=>$param) {
+        foreach ($this->worker_context->getConfig('components') as $class=>$param) {
             $class_name=$param['class'];
             $this->components[$class]=$this->buildInstance($class_name, $param['params']);
         }

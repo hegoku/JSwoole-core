@@ -1,47 +1,47 @@
 <?php
 namespace JSwoole;
 
-use JSwoole\Content\WorkerContent;
-use JSwoole\Content\RequestContent;
+use JSwoole\Context\WorkerContext;
+use JSwoole\Context\RequestContext;
 
 class JSwoole
 {
-    protected static $requestContent=[];
-    protected static $worker_content;
+    protected static $requestContext=[];
+    protected static $worker_context;
 
-    public static function initWorderContent($worker_id, $app_config)
+    public static function initWorderContext($worker_id, $app_config)
     {
-        static::$worker_content=new WorkerContent($worker_id);
-        static::$worker_content->setConfig($app_config);
+        static::$worker_context=new WorkerContext($worker_id);
+        static::$worker_context->setConfig($app_config);
     }
 
-    public static function getWorkerContent()
+    public static function getWorkerContext()
     {
-        return static::$worker_content;
+        return static::$worker_context;
     }
 
-    public static function addRequestContent()
+    public static function addRequestContext()
     {
         $cid=\co::getuid();
-        if (isset(static::$requestContent[$cid])) {
-            unset(static::$requestContent[$cid]);
+        if (isset(static::$requestContext[$cid])) {
+            unset(static::$requestContext[$cid]);
         }
-        static::$requestContent[$cid]=new RequestContent(static::getWorkerContent());
+        static::$requestContext[$cid]=new RequestContext(static::getWorkerContext());
     }
 
-    public static function removeRequestContent()
+    public static function removeRequestContext()
     {
         $cid=\co::getuid();
-        if (isset(static::$requestContent[$cid])) {
-            unset(static::$requestContent[$cid]);
+        if (isset(static::$requestContext[$cid])) {
+            unset(static::$requestContext[$cid]);
         }
     }
 
     public static function app()
     {
         $cid=\co::getuid();
-        if (isset(static::$requestContent[$cid])) {
-            return static::$requestContent[$cid];
+        if (isset(static::$requestContext[$cid])) {
+            return static::$requestContext[$cid];
         } else {
             return null;
         }

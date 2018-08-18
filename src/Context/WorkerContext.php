@@ -1,7 +1,7 @@
 <?php
-namespace JSwoole\Content;
+namespace JSwoole\Context;
 
-class WorkerContent
+class WorkerContext
 {
     protected $app_config;
     protected $worker_id=0;
