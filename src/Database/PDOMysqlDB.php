@@ -4,7 +4,7 @@ namespace JSwoole\Database;
 use JSwoole\Database\SwoolePDO;
 use Illuminate\Database\MySqlConnection;
 
-class DB
+class PDOMysqlDB
 {
     public $connection=[];
     public $connection_config=[];
@@ -13,15 +13,8 @@ class DB
     {
         $this->connection_config=$connection_config;
         foreach ($this->connection_config as $name=>$v) {
-            $pdo = new SwoolePDO();
-            $pdo->connect([
-                'host'        => $v['host'],
-                'port'        => $v['port'],
-                'user'        => $v['username'],
-                'password'    => $v['password'],
-                'database'    => $v['database'],
-                'charset'     => $v['utf8'],
-            ]);
+            $dsn='mysql:dbname='.$v['database'].';host='.$v['host'];
+            $pdo=new \PDO($dsn, $v['username'], $v['password']);
             $this->connection[$name]=new MysqlConnection($pdo, $v['database'], $v['prefix']);
         }
     }
