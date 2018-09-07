@@ -20,7 +20,7 @@ class SwooleCoroutineMysqlDB
                 'user'        => $v['username'],
                 'password'    => $v['password'],
                 'database'    => $v['database'],
-                'charset'     => $v['utf8'],
+                'charset'     => $v['charset'],
             ]);
             $this->connection[$name]=new MysqlConnection($pdo, $v['database'], $v['prefix']);
         }
