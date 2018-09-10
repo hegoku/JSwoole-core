@@ -10,6 +10,7 @@
             "role": "Founder and project lead"
         }
     ],
+    "minimum-stability": "0.0.2",
     "require": {
         "php": ">=7.1.0",
         "illuminate/database": "5.6",
