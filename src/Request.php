@@ -14,37 +14,37 @@ class Request extends BaseRequest
         $cookie=isset($swooleRequest->cookie)?$swooleRequest->cookie:[];
 
         $server = [
-            'REQUEST_METHOD' => $request->server['request_method'],
-            'REQUEST_URI' => $request->server['request_uri'],
-            'PATH_INFO' => $request->server['path_info'],
-            'REQUEST_TIME' => $request->server['request_time'],
+            'REQUEST_METHOD' => $swooleRequest->server['request_method'],
+            'REQUEST_URI' => $swooleRequest->server['request_uri'],
+            'PATH_INFO' => $swooleRequest->server['path_info'],
+            'REQUEST_TIME' => $swooleRequest->server['request_time'],
             'GATEWAY_INTERFACE' => 'swoole/' . SWOOLE_VERSION,
             // Server
-            'SERVER_PROTOCOL' => isset($request->header['server_protocol']) ? $request->header['server_protocol'] : $request->server['server_protocol'],
-            'REQUEST_SCHEMA' => isset($request->header['request_scheme']) ? $request->header['request_scheme'] : explode('/', $request->server['server_protocol'])[0],
-            'SERVER_NAME' => isset($request->header['server_name']) ? $request->header['server_name'] : $host,
-            'SERVER_ADDR' => $host,
-            'SERVER_PORT' => isset($request->header['server_port']) ? $request->header['server_port'] : $request->server['server_port'],
-            'REMOTE_ADDR' => $host,
-            'REMOTE_PORT' => isset($request->header['remote_port']) ? $request->header['remote_port'] : $request->server['remote_port'],
-            'QUERY_STRING' => isset($request->server['query_string']) ? $request->server['query_string'] : '',
+            'SERVER_PROTOCOL' => $swooleRequest->server['server_protocol'],
+            'REQUEST_SCHEMA' => isset($swooleRequest->header['request_scheme']) ? $swooleRequest->header['request_scheme'] : explode('/', $swooleRequest->server['server_protocol'])[0],
+            'SERVER_NAME' => isset($swooleRequest->server['server_name']) ? $swooleRequest->server['server_name'] : '',
+            'SERVER_ADDR' => $swooleRequest->header['host'],
+            'SERVER_PORT' => $swooleRequest->server['server_port'],
+            'REMOTE_ADDR' => $swooleRequest->server['remote_addr'],
+            'REMOTE_PORT' => $swooleRequest->server['remote_port'],
+            'QUERY_STRING' => isset($swooleRequest->server['query_string']) ? $swooleRequest->server['query_string'] : '',
             // Headers
-            'HTTP_HOST' => $host,
-            'HTTP_USER_AGENT' => isset($request->header['user-agent']) ? $request->header['user-agent'] : '',
-            'HTTP_ACCEPT' => isset($request->header['accept']) ? $request->header['accept'] : '*/*',
-            'HTTP_ACCEPT_LANGUAGE' => isset($request->header['accept-language']) ? $request->header['accept-language'] : '',
-            'HTTP_ACCEPT_ENCODING' => isset($request->header['accept-encoding']) ? $request->header['accept-encoding'] : '',
-            'HTTP_CONNECTION' => isset($request->header['connection']) ? $request->header['connection'] : '',
-            'HTTP_CACHE_CONTROL' => isset($request->header['cache-control']) ? $request->header['cache-control'] : '',
+            'HTTP_HOST' => $swooleRequest->header['host'],
+            'HTTP_USER_AGENT' => isset($swooleRequest->header['user-agent']) ? $swooleRequest->header['user-agent'] : '',
+            'HTTP_ACCEPT' => isset($swooleRequest->header['accept']) ? $swooleRequest->header['accept'] : '*/*',
+            'HTTP_ACCEPT_LANGUAGE' => isset($swooleRequest->header['accept-language']) ? $swooleRequest->header['accept-language'] : '',
+            'HTTP_ACCEPT_ENCODING' => isset($swooleRequest->header['accept-encoding']) ? $swooleRequest->header['accept-encoding'] : '',
+            'HTTP_CONNECTION' => isset($swooleRequest->header['connection']) ? $swooleRequest->header['connection'] : '',
+            'HTTP_CACHE_CONTROL' => isset($swooleRequest->header['cache-control']) ? $swooleRequest->header['cache-control'] : '',
         ];
 
         $request=new self($get, $post, [], $cookie, $files, $server, $swooleRequest->rawContent());
-        if (0 === strpos($swooleRequest->header['content-type'], 'application/x-www-form-urlencoded')
+        if (0 === strpos(@$swooleRequest->header['content-type'], 'application/x-www-form-urlencoded')
             && in_array(strtoupper($swooleRequest->server['request_method']), array('POST', 'PUT', 'DELETE', 'PATCH'))
             ) {
             parse_str($swooleRequest->rawContent(), $data);
             $request->request= new \Symfony\Component\HttpFoundation\ParameterBag($data);
-        } elseif (0 === strpos($swooleRequest->header['content-type'], 'application/json')
+        } elseif (0 === strpos(@$swooleRequest->header['content-type'], 'application/json')
             && in_array(strtoupper($swooleRequest->server['request_method']), array('POST', 'PUT', 'DELETE', 'PATCH'))
             ) {
             $data=json_decode($swooleRequest->rawContent(), true);
