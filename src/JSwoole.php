@@ -6,6 +6,8 @@ use JSwoole\Context\RequestContext;
 
 class JSwoole
 {
+    public static $base_path='';
+    
     protected static $requestContext=[];
     protected static $worker_context;
 
@@ -15,7 +17,7 @@ class JSwoole
         static::$worker_context->setConfig($app_config);
     }
 
-    public static function getWorkerContext()
+    public static function getWorkerContext() : WorkerContext
     {
         return static::$worker_context;
     }
