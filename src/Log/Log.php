@@ -42,7 +42,9 @@ class Log
         $this->messages = [];
         foreach ($messages as $category=>$message) {
             foreach ($message as $v) {
-                $this->targets[$category]->export($v);
+                if (isset($this->targets[$category])) {
+                    $this->targets[$category]->export($v);
+                }
             }
         }
     }
