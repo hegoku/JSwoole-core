@@ -15,6 +15,7 @@ class PDOMysqlDB
         foreach ($this->connection_config as $name=>$v) {
             $dsn='mysql:dbname='.$v['database'].';host='.$v['host'];
             $pdo=new \PDO($dsn, $v['username'], $v['password']);
+            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->connection[$name]=new MysqlConnection($pdo, $v['database'], $v['prefix']);
         }
     }
