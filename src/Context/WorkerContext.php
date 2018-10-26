@@ -30,7 +30,7 @@ class WorkerContext
         }
     }
 
-    public function getRote()
+    public function getRoute()
     {
         return $this->app_config['route'];
     }
