@@ -28,7 +28,7 @@ class JSwoole
         if (isset(static::$requestContext[$cid])) {
             unset(static::$requestContext[$cid]);
         }
-        static::$requestContext[$cid]=new RequestContext(static::getWorkerContext());
+        static::$requestContext[$cid]=new RequestContext($cid, static::getWorkerContext());
     }
 
     public static function removeRequestContext()
