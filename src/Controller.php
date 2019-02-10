@@ -1,7 +1,7 @@
 <?php
 namespace JSwoole;
 
-use JSWoole\Request;
+use JSwoole\Request;
 use JSwoole\Response;
 
 class Controller
