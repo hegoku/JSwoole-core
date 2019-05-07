@@ -8,7 +8,7 @@ class MysqlPoolManager extends AbstractPool implements ManagerInterface
 {
     private $config;
     private $connection=null;
-    private $wait_timeout;
+    private static $wait_timeout;
     protected static $is_m_init=false;
     
     public function __construct($config)
@@ -16,9 +16,11 @@ class MysqlPoolManager extends AbstractPool implements ManagerInterface
         $this->config=$config;
         if (!static::$is_m_init) {
             static::$is_m_init=true;
-            parent::__construct($config['pool_max']);
-            $this->wait_timeout=$config['wait_timeout'];
-            $this->checkConnection();
+            static::$max=$config['pool_max'];
+            static::$wait_timeout=$config['wait_timeout'];
+            // parent::__construct($config['pool_max']);/
+            // $this->wait_timeout=$config['wait_timeout'];
+            static::checkConnection();
         }
     }
 
@@ -42,15 +44,17 @@ class MysqlPoolManager extends AbstractPool implements ManagerInterface
 
     public function __destruct()
     {
-        $this->pushItem($this->connection);
+        if ($this->connection!=null) {
+            $this->pushItem($this->connection);
+        }
     }
 
-    public function checkConnection()
+    public static function checkConnection()
     {
         swoole_timer_tick(12000, function ($timer_id) {
-            if (self::$pool->length()<=0) return;
-            $item=$this->getItem(1);
-            if (($item['last_used_time']+$this->wait_timeout)<time()) {
+            if (self::$count<=0 || self::$pool->length()<=0) return;
+            $item=self::$pool->pop(1);
+            if (($item['last_used_time']+static::$wait_timeout)<time()) {
                 $item=null;
                 self::$pool->push([
                     'create_time'=>time(),
