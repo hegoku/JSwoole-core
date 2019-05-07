@@ -7,12 +7,27 @@ class Route
         'GET'=>[],
         'POST'=>[],
         'PUT'=>[],
-        'DELETE'=>[]
+        'DELETE'=>[],
+        'OPTIONS'=>[],
+        'HEAD'=>[],
+        'TRACE'=>[],
+        'CONNECT'=>[]
     ];
 
     public function loadRouter($router_table){
         foreach($router_table as $v){
-            $this->addRouter(strtoupper($v[0]),$v[1],$v[2]);
+            if ($v[0]=='*') {
+                foreach ($this->routers as $method=>$value) {
+                    $this->addRouter($method,$v[1],$v[2]);
+                }
+            } elseif (stripos($v[0], '/')!==false) {
+                $methods=explode('/', $v[0]);
+                foreach ($methods as $value) {
+                    $this->addRouter(strtoupper($value),$v[1],$v[2]); 
+                }
+            } else {
+                $this->addRouter(strtoupper($v[0]),$v[1],$v[2]);
+            }
         }
     }
 
