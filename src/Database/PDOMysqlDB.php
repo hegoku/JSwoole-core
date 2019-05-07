@@ -1,9 +1,7 @@
 <?php
 namespace JSwoole\Database;
 
-use JSwoole\Database\SwoolePDO;
-use JSwoole\Database\Manager\MysqlPoolManager;
-use Illuminate\Database\MySqlConnection;
+use JSwoole\Database\MysqlPoolManager;
 
 class PDOMysqlDB
 {
@@ -18,12 +16,12 @@ class PDOMysqlDB
         }
     }
 
-    public function connection($name = null)
+    public function connection($name)
     {
         if (isset($this->manager[$name])) {
             return $this->manager[$name]->getConnection();
         } else {
-            return null;
+            throw new \Exception('MysqlPoolManager '.$name.' not exist');
         }
     }
 

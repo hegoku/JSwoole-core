@@ -1,10 +1,11 @@
 <?php
-namespace JSwoole\Database\Manager;
+namespace JSwoole\Database;
 
 use Illuminate\Database\MySqlConnection;
 use JSwoole\Database\AbstractPool;
+use Swoole\Timer;
 
-class MysqlPoolManager extends AbstractPool implements ManagerInterface
+class MysqlPoolManager extends AbstractPool
 {
     private $config;
     private $connection=null;
@@ -18,8 +19,6 @@ class MysqlPoolManager extends AbstractPool implements ManagerInterface
             static::$is_m_init=true;
             static::$max=$config['pool_max'];
             static::$wait_timeout=$config['wait_timeout'];
-            // parent::__construct($config['pool_max']);/
-            // $this->wait_timeout=$config['wait_timeout'];
             static::checkConnection();
         }
     }
@@ -39,6 +38,9 @@ class MysqlPoolManager extends AbstractPool implements ManagerInterface
         if ($this->connection==null) {
             $this->connection=$this->getItem();
         }
+        if (empty($this->connection)) {
+            throw new \Exception('Get connection timeout, database: '.$this->config['database']);
+        }
         return $this->connection['data'];
     }
 
@@ -51,9 +53,12 @@ class MysqlPoolManager extends AbstractPool implements ManagerInterface
 
     public static function checkConnection()
     {
-        swoole_timer_tick(12000, function ($timer_id) {
+        Timer::tick(12000, function ($timer_id) {
             if (self::$count<=0 || self::$pool->length()<=0) return;
             $item=self::$pool->pop(1);
+            if (empty($item)) {
+                return;
+            }
             if (($item['last_used_time']+static::$wait_timeout)<time()) {
                 $item=null;
                 self::$pool->push([

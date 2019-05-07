@@ -26,7 +26,7 @@ class RequestContext
         if (isset($this->components[$name])) {
             return $this->components[$name];
         } else {
-            return null;
+            throw new \Exception('Component '.$name.' not exist');
         }
     }
 }

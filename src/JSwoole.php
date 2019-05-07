@@ -11,7 +11,7 @@ class JSwoole
     protected static $requestContext=[];
     protected static $worker_context;
 
-    public static function initWorderContext($worker_id, $app_config)
+    public static function initWorkerContext($worker_id, $app_config)
     {
         static::$worker_context=new WorkerContext($worker_id);
         static::$worker_context->setConfig($app_config);
