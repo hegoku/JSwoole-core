@@ -7,15 +7,15 @@ use Swoole\Timer;
 
 class MysqlPoolManager extends AbstractPool
 {
-    private $config;
     private $connection=null;
+    private static $config;
     private static $wait_timeout;
     protected static $is_m_init=false;
     
     public function __construct($config)
     {
-        $this->config=$config;
         if (!static::$is_m_init) {
+            static::$config=$config;
             static::$is_m_init=true;
             static::$max=$config['pool_max'];
             static::$wait_timeout=$config['wait_timeout'];
@@ -23,23 +23,23 @@ class MysqlPoolManager extends AbstractPool
         }
     }
 
-    public function createItem()
+    public static function createItem()
     {
-        $dsn='mysql:dbname='.$this->config['database'].';host='.$this->config['host'].';charset='.$this->config['charset'];
-        $pdo=new \PDO($dsn, $this->config['username'], $this->config['password']);
+        $dsn='mysql:dbname='.static::$config['database'].';host='.static::$config['host'].';charset='.static::$config['charset'];
+        $pdo=new \PDO($dsn, static::$config['username'], static::$config['password']);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-        return new MysqlConnection($pdo, $this->config['database'], $this->config['prefix']);
+        return new MysqlConnection($pdo, static::$config['database'], static::$config['prefix']);
     }
 
     public function getConnection()
     {
         if ($this->connection==null) {
-            $this->connection=$this->getItem();
+            $this->connection=static::getItem();
         }
         if (empty($this->connection)) {
-            throw new \Exception('Get connection timeout, database: '.$this->config['database']);
+            throw new \Exception('Get connection timeout, database: '.static::$config['database']);
         }
         return $this->connection['data'];
     }
@@ -47,7 +47,7 @@ class MysqlPoolManager extends AbstractPool
     public function __destruct()
     {
         if ($this->connection!=null) {
-            $this->pushItem($this->connection);
+            static::pushItem($this->connection);
         }
     }
 
@@ -63,7 +63,7 @@ class MysqlPoolManager extends AbstractPool
                 $item=null;
                 self::$pool->push([
                     'create_time'=>time(),
-                    'data'=>$this->createItem(),
+                    'data'=>static::createItem(),
                     'last_used_time'=>time()
                 ]);
             } else {

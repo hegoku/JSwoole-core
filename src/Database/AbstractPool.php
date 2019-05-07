@@ -8,43 +8,26 @@ abstract class AbstractPool
     protected static $pool;
     protected static $count;
     protected static $max=0;
-    // protected static $is_init=false;
 
-    public abstract function createItem();
+    public static abstract function createItem();
 
-    // public function __construct($count)
-    // {
-    //     if (!static::$is_init) {
-    //         static::$is_init=true;
-    //         static::$pool=new Channel($count);
-    //         for ($i=0;$i<$count;$i++) {
-    //             static::$pool->push([
-    //                 'create_time'=>time(),
-    //                 'data'=>$this->createItem(),
-    //                 'last_used_time'=>time()
-    //             ]);
-    //         }
-    //     }
-        
-    // }
-
-    public function getItem($time_out=10)
+    public static function getItem($time_out=10)
     {
         if (static::$count==0) {
             static::$pool=new Channel(static::$max); 
         }
         if (static::$count<static::$max) {
+            static::$count++; //要先加+1，锁住，再push，否则并发会有问题
             static::$pool->push([
                 'create_time'=>time(),
-                'data'=>$this->createItem(),
+                'data'=>static::createItem(),
                 'last_used_time'=>time()
             ]); 
-            static::$count++;
         }
         return static::$pool->pop($time_out);
     }
 
-    public function pushItem($item)
+    public static function pushItem($item)
     {
         $item['last_used_time']=time();
         static::$pool->push($item);
