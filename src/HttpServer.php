@@ -64,9 +64,6 @@ class HttpServer
         });
 
         $this->server->on('request', function($swooleRequest, $swooleResponse) {
-            if ($swooleRequest->server['request_uri']=='/favicon.ico') {
-                return $swooleResponse->end('');
-            }
             JSwoole::addRequestContext();
             try {
                 JSwoole::app()->loadComponents();
