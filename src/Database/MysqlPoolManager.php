@@ -30,7 +30,7 @@ class MysqlPoolManager extends AbstractPool
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-        return new MysqlConnection($pdo, static::$config['database'], static::$config['prefix']);
+        return new MysqlConnection($pdo, static::$config['database'], static::$config['prefix'], static::$config);
     }
 
     public function getConnection()
@@ -44,11 +44,20 @@ class MysqlPoolManager extends AbstractPool
         return $this->connection['data'];
     }
 
-    public function __destruct()
+    public function release()
     {
         if ($this->connection!=null) {
+            if ($this->connection['data']->logging()) {
+                $this->connection['data']->flushQueryLog();
+            }
             static::pushItem($this->connection);
+            $this->connection=null;
         }
+    }
+
+    public function __destruct()
+    {
+        $this->release();
     }
 
     public static function checkConnection()

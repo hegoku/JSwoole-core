@@ -12,6 +12,8 @@ class PDOMysqlDB
     {
         $this->connection_config=$connection_config;
         foreach ($this->connection_config as $name=>$v) {
+            $v['name']=$name; //给laravel connection用
+            $v['driver']='mysql'; //给laravel connection用
             $this->manager[$name]=new MysqlPoolManager($v);
         }
     }
