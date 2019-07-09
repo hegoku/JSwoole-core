@@ -25,7 +25,7 @@ class MysqlPoolManager extends AbstractPool
 
     public static function createItem()
     {
-        $dsn='mysql:dbname='.static::$config['database'].';host='.static::$config['host'].';charset='.static::$config['charset'];
+        $dsn='mysql:dbname='.static::$config['database'].';host='.static::$config['host'].';port='.static::$config['port'].';charset='.static::$config['charset'];
         $pdo=new \PDO($dsn, static::$config['username'], static::$config['password']);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
