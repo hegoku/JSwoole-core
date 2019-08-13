@@ -3,7 +3,7 @@ namespace JSwoole\Database;
 
 use Swoole\Coroutine\Channel;
 
-abstract class AbstractPool
+trait PoolTrait
 {
     protected static $pool;
     protected static $count;

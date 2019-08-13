@@ -2,11 +2,13 @@
 namespace JSwoole\Database;
 
 use Illuminate\Database\MySqlConnection;
-use JSwoole\Database\AbstractPool;
+use JSwoole\Database\PoolTrait;
 use Swoole\Timer;
 
-class MysqlPoolManager extends AbstractPool
+class MysqlPoolManager
 {
+    use PoolTrait;
+
     private $connection=null;
     private static $config;
     private static $wait_timeout;
