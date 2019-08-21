@@ -38,6 +38,10 @@ class Request extends BaseRequest
             'HTTP_CACHE_CONTROL' => isset($swooleRequest->header['cache-control']) ? $swooleRequest->header['cache-control'] : '',
         ];
 
+        foreach ($swooleRequest->header as $key=>$v) {
+            $server['HTTP_'.$key]=$v;
+        }
+
         $request=new self($get, $post, [], $cookie, $files, $server, $swooleRequest->rawContent());
         if (0 === strpos(@$swooleRequest->header['content-type'], 'application/x-www-form-urlencoded')
             && in_array(strtoupper($swooleRequest->server['request_method']), array('POST', 'PUT', 'DELETE', 'PATCH'))
