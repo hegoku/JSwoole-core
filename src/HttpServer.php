@@ -73,6 +73,9 @@ class HttpServer
                 $controller='';
                 $action='';
                 try {
+                    if (is_null($swooleRequest->server['request_method']) || is_null($swooleRequest->server['request_uri'])) {
+                        throw new \JSwoole\Route\RouteException('server的request_method或者request_uri为null');
+                    }
                     list($controller, $action)=$route->parseUri($swooleRequest->server['request_method'], $swooleRequest->server['request_uri']);
                 } catch (\JSwoole\Route\RouteException $e) {
                     $swooleResponse->status(404);
