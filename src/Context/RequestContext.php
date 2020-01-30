@@ -29,4 +29,13 @@ class RequestContext
             throw new \Exception('Component '.$name.' not exist');
         }
     }
+
+    public function __call($name, $arguments)
+    {
+        if (isset($this->components[$name]) && is_callable($this->components[$name])) {
+            return call_user_func_array($this->components[$name], $arguments);
+        } else {
+            throw new \Exception('Method or Component '.$name.' not exist');
+        }
+    }
 }

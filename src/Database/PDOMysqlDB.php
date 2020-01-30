@@ -27,4 +27,9 @@ class PDOMysqlDB
         }
     }
 
+    public function __invoke($name)
+    {
+        return $this->connection($name);
+    }
+
 }
