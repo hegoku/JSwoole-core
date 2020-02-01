@@ -3,3 +3,7 @@
 illuminate/database
 
 illuminate/http::Request
+
+illuminate/container
+
+illuminate/pipeline

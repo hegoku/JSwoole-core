@@ -3,7 +3,7 @@ namespace JSwoole\Route;
 
 class Route
 {
-    protected $routers=[
+    protected static $routers=[
         'GET'=>[],
         'POST'=>[],
         'PUT'=>[],
@@ -14,39 +14,55 @@ class Route
         'CONNECT'=>[]
     ];
 
-    public function loadRouter($router_table){
+    public static function loadRouter($router_table){
         foreach($router_table as $v){
             if ($v[0]=='*') {
-                foreach ($this->routers as $method=>$value) {
-                    $this->addRouter($method,$v[1],$v[2]);
+                foreach (static::$routers as $method=>$value) {
+                    static::addRouter($method, $v[1], $v[2], $v['middlewares'] ?? []);
                 }
             } elseif (stripos($v[0], '/')!==false) {
                 $methods=explode('/', $v[0]);
                 foreach ($methods as $value) {
-                    $this->addRouter(strtoupper($value),$v[1],$v[2]); 
+                    static::addRouter(strtoupper($value), $v[1], $v[2], $v['middlewares'] ?? []); 
                 }
             } else {
-                $this->addRouter(strtoupper($v[0]),$v[1],$v[2]);
+                static::addRouter(strtoupper($v[0]), $v[1], $v[2], $v['middlewares'] ?? []);
             }
         }
     }
 
-    protected function addRouter($method,$uri,$action){
-        $this->routers[$method][$uri]=$action;
+    protected static function addRouter($method, $uri, $action, $middlewares=[]){
+        $action=explode('@', $action);
+        static::$routers[$method][$uri]=[
+            'controller'=>$action[0],
+            'action'=>$action[1],
+            'middlewares'=>$middlewares
+        ];
     }
 
-    public function parseUri(string $method, string $request_uri)
+    public static function parseUri(string $method, string $request_uri)
     {
-        if(!isset($this->routers[$method])){
+        if(!isset(static::$routers[$method])){
             throw new RouteException("HTTP Method not found.");
         }
 
-        foreach($this->routers[$method] as $uri=>$action){
-            $pregUri=preg_quote($uri,"/");
-            $pattern=preg_replace('/\\\{(\w+)\\\}/','(\w+)',$pregUri); // \/index\/\{fd\} replace \{fd\} to (w+)
-            $res=preg_match_all('/'.$pattern.'$/',$request_uri);
+        foreach(static::$routers[$method] as $uri=>$item){
+            $pregUri=preg_quote($uri, '/');
+            $pattern=preg_replace('/\\\{(\w+)\\\}/', '(\w+)', $pregUri); // \/index\/\{fd\} replace \{fd\} to (w+)
+            $res=preg_match_all('/'.$pattern.'$/', $request_uri);
             if($res>0){
-                return explode("@",$action);
+                $ret=$item;
+
+                preg_match_all('/\{(\w+)\}/', $uri, $matches);
+                $parametersKey= isset($matches[1]) ? $matches[1] : [];
+                preg_match_all('/'.$pattern.'$/', $request_uri, $matches);
+                array_shift($matches);
+                $parametersValue=[];
+                foreach($matches as $value){
+                    array_push($parametersValue, $value[0]);
+                }
+                $ret['params']=array_combine($parametersKey, $parametersValue);
+                return $ret;
             }
         }
         throw new RouteException("Route not found.");

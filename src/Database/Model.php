@@ -8,6 +8,6 @@ class Model extends BaseModel
 {
     public static function resolveConnection($connection = null)
     {
-        return JSwoole::app()->db->connection($connection);
+        return JSwoole::app()->db($connection);
     }
 }

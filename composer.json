@@ -13,8 +13,10 @@
     "require": {
         "php": ">=7.2",
         "ext-swoole": ">=4.2.0",
-        "illuminate/database": "6.0",
-        "illuminate/http": "6.0",
+        "illuminate/database": "^6.13",
+        "illuminate/http": "^6.13",
+        "illuminate/container": "^6.13",
+        "illuminate/pipeline": "^6.13",
         "vlucas/phpdotenv": "^3.3"
     },
     "autoload": {

@@ -2,6 +2,8 @@
 namespace JSwoole;
 
 use Swoole\Http\Server as SwooleHttpServer;
+use JSwoole\Route\Route;
+use Illuminate\Pipeline\Pipeline;
 
 class HttpServer
 {
@@ -61,6 +63,7 @@ class HttpServer
             }
 
             JSwoole::initWorkerContext($worker_id, $this->app_config);
+            Route::loadRouter(\JSwoole\JSwoole::getWorkerContext()->getConfig('route'));
         });
 
         $this->server->on('request', function($swooleRequest, $swooleResponse) {
@@ -68,24 +71,27 @@ class HttpServer
             try {
                 JSwoole::app()->loadComponents();
         
-                $route=new \JSwoole\Route\Route();
-                $route->loadRouter(\JSwoole\JSwoole::getWorkerContext()->getConfig('route'));
                 $controller='';
-                $action='';
+                $route_ret=[];
                 try {
                     if (is_null($swooleRequest->server['request_method']) || is_null($swooleRequest->server['request_uri'])) {
                         throw new \JSwoole\Route\RouteException('server的request_method或者request_uri为null');
                     }
-                    list($controller, $action)=$route->parseUri($swooleRequest->server['request_method'], $swooleRequest->server['request_uri']);
+                    $route_ret=Route::parseUri($swooleRequest->server['request_method'], $swooleRequest->server['request_uri']);
                 } catch (\JSwoole\Route\RouteException $e) {
                     $swooleResponse->status(404);
                     return $swooleResponse->end(json_encode(['code'=>404, 'msg'=>'请求不存在']));
                 }
             
-                $controller='\\'.\JSwoole\JSwoole::getWorkerContext()->getConfig('controller_namespace').$controller;
-                $request=\JSwoole\Request::createFromSwoole($swooleRequest);
+                $controller='\\'.JSwoole::getWorkerContext()->getConfig('controller_namespace').$route_ret['controller'];
+                $request=Request::createFromSwoole($swooleRequest);
                 $controllerInstance=new $controller($request);
-                $response=$controllerInstance->$action();
+                $response=(new Pipeline(JSwoole::app()->container))
+                    ->send($request)
+                    ->through($route_ret['middlewares'])
+                    ->then(function ($request) use ($controllerInstance, $route_ret) {
+                        return call_user_func_array([$controllerInstance, $route_ret['action']], $route_ret['params']);
+                });
             
                 foreach ($response->getHeaders() as $name=>$values) {
                     $swooleResponse->header($name, implode(', ', $values));
