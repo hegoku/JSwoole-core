@@ -1,24 +1,33 @@
 <?php
 namespace JSwoole\Context;
 
+use Illuminate\Container\Container;
+
 class RequestContext
 {
-    use ComponentTrait {
-        loadComponents as traitLoadComponents;
-    }
-
     protected $worker_context;
+    protected $components=[];
     public $co_uid;
+    public $container;
 
     public function __construct($co_uid, $worker_context)
     {
         $this->worker_context=$worker_context;
         $this->co_uid=$co_uid;
+        $this->container=new Container();
     }
 
     public function loadComponents()
     {
-        $this->traitLoadComponents($this->worker_context->getConfig('components'));
+        $components_config=$this->worker_context->getConfig('components');
+        foreach ($components_config as $class=>$param) {
+            $this->components[$class]=$this->container->make($param['class'], $param['params']);
+        }
+    }
+
+    public function getComponents()
+    {
+        return $this->components;
     }
 
     public function __get($name)
