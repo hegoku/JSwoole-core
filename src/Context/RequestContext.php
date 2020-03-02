@@ -21,13 +21,18 @@ class RequestContext
     {
         $components_config=$this->worker_context->getConfig('components');
         foreach ($components_config as $class=>$param) {
-            $this->components[$class]=$this->container->make($param['class'], $param['params']);
+            $this->components[$class]=$this->container->make($param['class'], $param['params']??[]);
         }
     }
 
     public function getComponents()
     {
         return $this->components;
+    }
+
+    public function addComponent($name, $object)
+    {
+        $this->components[$name]=$object;
     }
 
     public function __get($name)
