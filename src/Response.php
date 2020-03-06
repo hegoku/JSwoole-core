@@ -6,6 +6,7 @@ class Response
     protected $headers=[];
     protected $status_code=200;
     protected $body='';
+    protected $redirect_url='';
 
     public function withHeader(string $name, $value)
     {
@@ -72,6 +73,18 @@ class Response
     public function getBody()
     {
         return $this->body;
+    }
+
+    public function redirect($url)
+    {
+        $this->withStatus(302);
+        $this->redirect_url=$url;
+        return $this;
+    }
+
+    public function getRedirectUrl()
+    {
+        return $this->redirect_url;
     }
 
 }

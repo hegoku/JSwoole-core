@@ -96,8 +96,13 @@ class HttpServer
                 foreach ($response->getHeaders() as $name=>$values) {
                     $swooleResponse->header($name, implode(', ', $values));
                 }
-                $swooleResponse->status($response->getStatusCode());
-                $swooleResponse->end($response->getBody());
+                if ($response->getStatusCode()==302) {
+                    $swooleResponse->redirect($response->getRedirectUrl());
+                } else {
+                    $swooleResponse->status($response->getStatusCode());
+                    $swooleResponse->end($response->getBody());
+                }
+                
                 
             } catch (\Exception $e) {
                 if (!$this->daemonize) {
