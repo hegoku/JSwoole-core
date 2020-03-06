@@ -93,9 +93,16 @@ class HttpServer
                         return call_user_func_array([$controllerInstance, $route_ret['action']], $route_ret['params']);
                 });
             
-                foreach ($response->getHeaders() as $name=>$values) {
+                $response_headers=$response->getHeaders();
+                foreach ($response_headers as $name=>$values) {
                     $swooleResponse->header($name, implode(', ', $values));
                 }
+
+                $response_cookies=$response->getCookies();
+                foreach ($response_cookies as $name=>$values) {
+                    $swooleResponse->cookie($name, $values['value'], $values['expire'], $values['path'], $values['domain'], $values['secure'], $values['httponly'], $values['samesite']);
+                }
+                
                 if ($response->getStatusCode()==302) {
                     $swooleResponse->redirect($response->getRedirectUrl());
                 } else {

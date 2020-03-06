@@ -7,6 +7,7 @@ class Response
     protected $status_code=200;
     protected $body='';
     protected $redirect_url='';
+    protected $cookies=[];
 
     public function withHeader(string $name, $value)
     {
@@ -85,6 +86,25 @@ class Response
     public function getRedirectUrl()
     {
         return $this->redirect_url;
+    }
+
+    public function withCookie(string $key, string $value = '', int $expire = 0 , string $path = '/', string $domain  = '', bool $secure = false , bool $httponly = false, string $samesite = '')
+    {
+        $this->cookies[$key]=[
+            'value'=>$value,
+            'expire'=>$expire,
+            'path'=>$path,
+            'domain'=>$domain,
+            'secure'=>$secure,
+            'httponly'=>$httponly,
+            'samesite'=>$samesite
+        ];
+        return $this;
+    }
+
+    public function getCookies()
+    {
+        return $this->cookies;
     }
 
 }
