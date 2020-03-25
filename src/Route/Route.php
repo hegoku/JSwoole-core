@@ -49,13 +49,13 @@ class Route
         foreach(static::$routers[$method] as $uri=>$item){
             $pregUri=preg_quote($uri, '/');
             $pattern=preg_replace('/\\\{(\w+)\\\}/', '(\w+)', $pregUri); // \/index\/\{fd\} replace \{fd\} to (w+)
-            $res=preg_match_all('/'.$pattern.'$/', $request_uri);
+            $res=preg_match_all('/^'.$pattern.'$/', $request_uri);
             if($res>0){
                 $ret=$item;
 
                 preg_match_all('/\{(\w+)\}/', $uri, $matches);
                 $parametersKey= isset($matches[1]) ? $matches[1] : [];
-                preg_match_all('/'.$pattern.'$/', $request_uri, $matches);
+                preg_match_all('/^'.$pattern.'$/', $request_uri, $matches);
                 array_shift($matches);
                 $parametersValue=[];
                 foreach($matches as $value){
