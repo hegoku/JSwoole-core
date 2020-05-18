@@ -32,6 +32,11 @@ class MysqlPoolManager
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+        if (isset(static::$config['collation'])) {
+            $pdo->prepare('set names "'.static::$config['charset'].'" COLLATE "'.static::$config['collation'].'"')->execute();
+        } else {
+            $pdo->prepare('set names "'.static::$config['charset'].'"')->execute();
+        }
         return new MysqlConnection($pdo, static::$config['database'], static::$config['prefix'], static::$config);
     }
 
