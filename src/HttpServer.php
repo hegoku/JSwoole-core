@@ -114,9 +114,9 @@ class HttpServer
             } catch (\Exception $e) {
                 if (!$this->daemonize) {
                     echo Date("Y-m-d H:i:s ");
-                    var_dump($e->getTraceAsString());
+                    var_dump($e->getMessage().":\n".$e->getTraceAsString()."\n");
                 }
-                JSwoole::app()->log->log($e->getTraceAsString(), \JSwoole\Log\Log::LEVEL_ERROR, 'app');
+                JSwoole::app()->log->log($e->getMessage().":\n".$e->getTraceAsString()."\n", \JSwoole\Log\Log::LEVEL_ERROR, 'app');
                 $swooleResponse->status(500);
                 $swooleResponse->end(json_encode(['code'=>500, 'msg'=>'内部服务器错误']));
             } finally {
