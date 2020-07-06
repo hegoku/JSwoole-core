@@ -57,6 +57,7 @@ class MysqlPoolManager
             if ($this->connection['data']->logging()) {
                 $this->connection['data']->flushQueryLog();
             }
+            $this->connection['data']->rollBack();
             static::pushItem($this->connection);
             $this->connection=null;
         }
